@@ -2,7 +2,9 @@
 
 namespace Database\Seeders;
 
+use App\Models\User;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Hash;
 
 class UserTableSeeder extends Seeder
 {
@@ -14,5 +16,11 @@ class UserTableSeeder extends Seeder
     public function run()
     {
         //
+        User::create([
+            'name'=> 'Emmanuel Tilemu',
+            'email' => 'jameskaguo@live.com',
+            'password' => Hash::make('secret123')
+
+        ]);
     }
 }
