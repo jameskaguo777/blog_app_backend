@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Post;
+use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class PostController extends Controller
 {
@@ -12,6 +14,7 @@ class PostController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+    var $message = [];
     public function index()
     {
         //
@@ -38,6 +41,16 @@ class PostController extends Controller
     public function store(Request $request)
     {
         //
+        $this->validate($request, [
+            'title' => 'required',
+            'status' => 'required',
+            'image_url' => 'required|mime:png,jpg,jpeg',
+            'content' => 'required'
+        ]);
+
+        $post_ = new Post($request->all());
+        $user = Auth::user();
+        $aved = $user->post()->save($post_);
     }
 
     /**

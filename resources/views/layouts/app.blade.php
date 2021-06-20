@@ -19,6 +19,10 @@
     <link href="{{ asset('assets/vendors/jquery-toggles/css/themes/toggles-light.css') }}" rel="stylesheet"
         type="text/css">
 
+    <!-- Toastr CSS -->
+    <link href="{{ asset('assets/vendors/jquery-toast-plugin/dist/jquery.toast.min.css') }}" rel="stylesheet"
+        type="text/css">
+
     <!-- Custom CSS -->
     <link href="{{ asset('assets/dist/css/style.css') }}" rel="stylesheet" type="text/css">
 </head>
@@ -30,24 +34,24 @@
             @auth
                 @include('layouts.topbar')
                 @include('layouts.sidebar')
-                
+
                 <div class="hk-pg-wrapper">
                     @yield('breadcrumb')
-                <div class="container mt-xl-50 mt-sm-30 mt-15">
-                    @yield('content')
+                    <div class="container mt-xl-50 mt-sm-30 mt-15">
+                        @yield('content')
+                    </div>
+
                 </div>
-                
-            </div>
             @endauth
             @guest
                 @yield('content')
             @endguest
-            
+
         </div>
 
 
     </div>
-    
+
     <!-- jQuery -->
     <script src="{{ asset('assets/vendors/jquery/dist/jquery.min.js') }}"></script>
 
@@ -64,6 +68,58 @@
     <!-- FeatherIcons JavaScript -->
     <script src="{{ asset('assets/dist/js/feather.min.js') }}"></script>
     @stack('js')
+    <!-- Toastr JS -->
+    <script src="{{ asset('assets/vendors/jquery-toast-plugin/dist/jquery.toast.min.js') }}"></script>
+    {{-- <script src="{{ asset('assets/dist/js/toast-data.js') }}"></script> --}}
+
+    @if (session()->exists('success'))
+        <script>
+            $.toast({
+                heading: 'Well done!',
+                text: '<p>{{ session('success') }}</p>',
+                position: 'top-right',
+                loaderBg: '#7a5449',
+                class: 'jq-toast-success',
+                hideAfter: 3500,
+                stack: 6,
+                showHideTransition: 'fade'
+            });
+
+        </script>
+    @elseif(session()->exists('error'))
+        <script>
+            $.toast({
+                heading: 'OOPps!',
+                text: '<p>{{ session('error') }}</p>',
+                position: 'top-right',
+                loaderBg: '#7a5449',
+                class: 'jq-toast-danger',
+                hideAfter: 3500,
+                stack: 6,
+                showHideTransition: 'fade'
+            });
+
+        </script>
+
+    @elseif($errors->any())
+        <script>
+            $.toast({
+                heading: 'Alert!',
+                text: "<p> @foreach($errors->all() as $error) <li>{{ $error }}</li> @endforeach</p>",
+                position: 'top-right',
+                loaderBg: '#7a5449',
+                class: 'jq-toast-warning',
+                hideAfter: 3500,
+                stack: 6,
+                showHideTransition: 'fade'
+            });
+
+        </script>
+    @endif
+
+
+
+
     <!-- Toggles JavaScript -->
     <script src="{{ asset('assets/vendors/jquery-toggles/toggles.min.js') }}"></script>
     <script src="{{ asset('assets/dist/js/toggle-data.js') }}"></script>

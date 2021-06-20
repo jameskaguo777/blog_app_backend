@@ -15,6 +15,17 @@ class CreateCompetitionsTable extends Migration
     {
         Schema::create('competitions', function (Blueprint $table) {
             $table->id();
+            $table->string('theme');
+            $table->text('challenge');
+            $table->text('reward');
+            $table->text('criteria');
+            $table->string('target')->nullable();
+            $table->date('start_date')->nullable();
+            $table->date('end_date')->nullable();
+            $table->boolean('geo_locked')->nullable();
+            $table->point('coordinates')->nullable();
+            $table->integer('radius')->nullable();
+            $table->string('image_url')->nullable();
             $table->timestamps();
         });
     }

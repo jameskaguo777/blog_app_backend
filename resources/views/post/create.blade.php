@@ -14,53 +14,42 @@
      <div class="row">
         <div class="col-xl-12">
             <section class="hk-sec-wrapper">
-                            <h5 class="hk-sec-title">Send Notification</h5>
-                            <p class="mb-25">Send notification to Users, Teachers or Ward Admins or All by filling form below.</p>
+                            <h5 class="hk-sec-title">Create Post</h5>
+                            <p class="mb-25">Fill below to create a post</p>
                             <div class="row">
                                 <div class="col-sm">
-                                    <form>
+                                    <form action="" method="POST" enctype="multipart/form-data">
+                                        @csrf
                                         <div class="form-group row">
-                                            <label for="target" class="col-sm-2 col-form-label">Target</label>
+                                            <label for="inputTitle" class="col-sm-2 col-form-label">Title</label>
                                             <div class="col-sm-10">
-                                                <select class="form-control custom-select d-block w-100" required name="target" id="target">
-                                                    <option value="users">Users</option>
-                                                    <option value="schools">Teachers</option>
-                                                    <option value="wards">Ward</option>
-                                                    <option value="all">All</option>
-                                                </select>
-                                            </div>
-                                        </div>
-                                        <div class="form-group row">
-                                            <label for="inputHeading" class="col-sm-2 col-form-label">Heading</label>
-                                            <div class="col-sm-10">
-                                                <input type="text" class="form-control" required id="inputHeading" name="heading" placeholder="Enter Heading">
+                                                <input type="text" class="form-control" required id="inputTitle" name="title" placeholder="Enter Title">
                                             </div>
                                         </div>
 
                                         <div class="form-group row">
-                                            <label for="inputBody" class="col-sm-2 col-form-label">Body</label>
+                                            <label for="status" class="col-sm-2 col-form-label">Status</label>
                                             <div class="col-sm-10">
-                                                <textarea class="form-control" name="body" required id="inputBody" cols="30" rows="10"></textarea>
+                                                <select class="form-control custom-select d-block w-100" required name="status" id="status">
+                                                    <option value="1">Published</option>
+                                                    <option value="0">Unpublished</option>
+                                                </select>
                                             </div>
                                         </div>
-                                        <div class="form-group row">
-                                           <label for="inputImageUpload" class="col-sm-2 col-form-label">Upload Image</label>
+
+                                        <div class="form-group row ml-2">
+                                           <label for="inputImageUpload" class="col-form-label">Upload Image</label>
                                            <input id="inputImageUpload" name="image" type="file" class="form-control ml-4 mr-4">
                                         </div>
-                                        <!-- Row -->
+                                        
                                         <div class="row">
-                                            <div class="col-xl-12">
-                                                <section class="hk-sec-wrapper">
-                                                    <h5 class="hk-sec-title">Tinymce</h5>
-                                                    <p class="mb-40">The most powerful text editing platform for building content for the web.</p>
-                                                    <div class="row">
-                                                        <div class="col-sm">
-                                                            <div class="tinymce-wrap">
-                                                                <textarea class="tinymce"></textarea>
-                                                            </div>
-                                                        </div>
+                                            <div class="col-sm">
+                                                <label class="col-form-label" for="inputContent">
+                                                    Content
+                                                    <div id="inputContent" class="tinymce-wrap">
+                                                        <textarea name="content" class="tinymce"></textarea>
                                                     </div>
-                                                </section>
+                                                </label>
                                             </div>
                                         </div>
                 <!-- /Row -->

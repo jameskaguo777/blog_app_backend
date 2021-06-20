@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Competition;
+use Grimzy\LaravelMysqlSpatial\Types\Point;
 use Illuminate\Http\Request;
+use Monolog\Handler\RedisHandler;
 
 class CompetitionController extends Controller
 {
@@ -12,10 +14,13 @@ class CompetitionController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+
+    var $message = [];
     public function index()
     {
         //
-        return view('competition.index');
+        $competitions = Competition::get();
+        return view('competition.index', compact('competitions'));
     }
 
     /**
@@ -38,6 +43,58 @@ class CompetitionController extends Controller
     public function store(Request $request)
     {
         //
+        $this->validate($request, [
+            'theme' => 'required|max:250',
+            'challenge' => 'required',
+            'reward' => 'required',
+            'criteria' => 'required',
+            'target' => 'required',
+            'start_date' => 'required',
+            'end_date' => 'required',
+            'latitude' => 'nullable|numeric',
+            'longitude' => 'nullable|numeric',
+            'radius' => 'nullable|numeric',
+            'image_url' => 'nullable',
+            'geo_locked' => 'nullable|boolean',
+        ]);
+        $imagePath = null;
+        if (!empty($request->file('image_url'))) {
+            $imagePath = $request->file('image_url')->store('competition');
+        }
+        if ($request->target === 'wards') {
+            $competition = new Competition([
+                'theme' => $request->theme,
+                'challenge' => $request->challenge,
+                'reward' => $request->reward,
+                'criteria' => $request->criteria,
+                'target' => $request->target,
+                'start_date' => $request->start_date,
+                'end_date' => $request->end_date,
+                'image_url' => $imagePath,
+            ]);
+            if ($request->geo_locked) {
+                $coodinates = new Point($request->latitude, $request->longitude);
+                $competition->geo_locked = $request->geo_locked;
+                $competition->coordinates = $coodinates;
+                $competition->radius = $request->radius;
+            }
+
+            $saved = $competition->save();
+            
+            $retVal = ($saved) ? 'Successful created' : 'Something went wrong';
+            $message['message'] = $retVal;
+            $message['status'] = $saved;
+        } else{
+            $competition = new Competition($request->except('image_url', 'radius'));
+            $competition->image_url = $imagePath;
+            // dd($competition);
+            $saved = $competition->save();
+            $retVal = ($saved) ? 'Successful created' : 'Something went wrong';
+            $message['message'] = $retVal;
+            $message['status'] = $saved;
+        }
+
+        return ($message['status']) ? redirect()->back()->with('error', 'Something went wrong we couldn\'t save your data') : redirect()->back()->with('success', 'Competition added successfuly');
     }
 
     /**
