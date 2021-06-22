@@ -11,6 +11,13 @@ class Event extends Model
 
     protected $fillable = [ 'title', 'status', 'content', 'date', 'user_id' ];
 
+    protected $appends = [
+        'status_a'
+    ];
+    public function getStatusAAttribute(){
+        return ($this->status) ? 'Active' : 'Deactivated';
+    }
+
     public function user(){
         return $this->belongsTo(User::class, 'user_id', 'id');
     }

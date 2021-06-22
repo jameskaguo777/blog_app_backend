@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Event;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class EventController extends Controller
 {
@@ -12,10 +13,12 @@ class EventController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+    var $message = [];
     public function index()
     {
         //
-        return view('events.index');
+        $events = Event::get();
+        return view('events.index', compact('events'));
     }
 
     /**
@@ -38,6 +41,24 @@ class EventController extends Controller
     public function store(Request $request)
     {
         //
+        $this->validate($request, [
+            'title' => 'required|max:250',
+            'status' => 'nullable|boolean',
+            'content' => 'required',
+            'date' => 'required'
+        ]);
+
+        $user = Auth::user();
+        $event = new Event([
+            'title' => $request->title,
+            'content' => $request->content,
+            'date' => $request->date,
+            'status' => $request->status
+        ]);
+
+        $saved = $user->event()->save($event);
+        $message['message'] = ($saved) ? 'Successfuly event added' : 'Something went wrong';
+        return ($saved) ? redirect()->back()->with('success', $message['message']) : redirect()->back()->with('error', 'Sorry we coounlt publish your event');
     }
 
     /**

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Ward;
+use Grimzy\LaravelMysqlSpatial\Types\Point;
 use Illuminate\Http\Request;
 
 class WardController extends Controller
@@ -12,9 +13,12 @@ class WardController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+    var $message = [];
     public function index()
     {
         //
+        $wards = Ward::all();
+        return view('ward.index', compact('wards'));
     }
 
     /**
@@ -25,6 +29,7 @@ class WardController extends Controller
     public function create()
     {
         //
+        return view('ward.create');
     }
 
     /**
@@ -36,6 +41,21 @@ class WardController extends Controller
     public function store(Request $request)
     {
         //
+        $this->validate($request, [
+            'name'=>'required',
+            'activation_code'=>'required',
+            'latitude'=>'required',
+            'longitude'=>'required'
+        ]);
+        $coordinates = new Point($request->latitude, $request->longitude);
+        // dd($coordinates);
+        $wards = new Ward($request->except(['coordinates', 'status', 'activation_status']));
+        $wards->coordinates = $coordinates;
+        $wards->status = true;
+        $wards->activation_status = true;
+        $saved = $wards->save();
+        $this->message['message'] = ($saved) ? 'Successful ward added' : 'Something went wrong';
+        return ($saved) ? redirect()->back()->with('success', $this->message['message']) : $this->message['message'];
     }
 
     /**

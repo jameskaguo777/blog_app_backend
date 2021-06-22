@@ -94,7 +94,7 @@ class CompetitionController extends Controller
             $message['status'] = $saved;
         }
 
-        return ($message['status']) ? redirect()->back()->with('error', 'Something went wrong we couldn\'t save your data') : redirect()->back()->with('success', 'Competition added successfuly');
+       return ($message['status']) ? redirect()->back()->with('success', $message['message']) : redirect()->back()->with('error', $message['message']);
     }
 
     /**

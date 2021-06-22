@@ -17,6 +17,7 @@ class UserController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+    var $token_result;
     public function index()
     {
         //
@@ -124,11 +125,11 @@ class UserController extends Controller
             ]);
         }
 
-        $tokenResult = $user->createToken($request->device_name)->plainTextToken;
+        $this->token_result = $user->createToken($request->device_name)->plainTextToken;
 
         return response()->json([
             'status_code' => 200,
-            'access_token' => $tokenResult,
+            'access_token' => $this->token_result,
             'token_type' => 'Bearer',
         ]);
     }
@@ -148,16 +149,14 @@ class UserController extends Controller
             'unique' => ':attribute entered already in use',
         ]);
 
-        $tokenResult = '';
-
         if ($validated->fails()) {
             return response()->json([
                 'errors' => $validated->errors(),
             ]);
         }
 
-        DB::transaction(function () use ($request, $validated) {
-            
+        DB::transaction(function () use ($request) {
+
 
             $user = User::create([
                 'name' => $request->name,
@@ -170,12 +169,12 @@ class UserController extends Controller
                 'user_id' => $user->id
             ]);
 
-            $this->tokenResult = $user->createToken($request->device_name)->plainTextToken;
+            $this->token_result = $user->createToken($request->device_name)->plainTextToken;
         });
 
         return response()->json([
             'status' => 'success',
-            'access_token' => $tokenResult,
+            'access_token' => $this->token_result,
             'token_type' => 'Bearer',
         ]);
     }

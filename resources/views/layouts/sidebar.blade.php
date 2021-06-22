@@ -17,6 +17,13 @@
                                 {{-- <span class="badge badge-primary badge-pill">4</span> --}}
                             </a>
                         </li>
+                        <li class="nav-item {{ Route::currentRouteName() === 'wards' ? 'active' : '' }}">
+                            <a class="nav-link link-with-badge" href="{{ route('wards') }}">
+                                <span class="feather-icon"><i data-feather="map-pin"></i></span>
+                                <span class="nav-link-text">Wards</span>
+                                {{-- <span class="badge badge-primary badge-pill">4</span> --}}
+                            </a>
+                        </li>
                         <li class="nav-item {{ Route::currentRouteName() === 'competitions' ? 'active' : '' }}">
                             <a class="nav-link" href="{{ route('competitions') }}">
                                 <span class="feather-icon"><i data-feather="zap"></i></span>

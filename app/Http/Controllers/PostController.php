@@ -15,10 +15,12 @@ class PostController extends Controller
      * @return \Illuminate\Http\Response
      */
     var $message = [];
+
     public function index()
     {
         //
-        return view('post.index');
+        $posts = Post::get();
+        return view('post.index', compact('posts'));
     }
 
     /**
@@ -44,13 +46,26 @@ class PostController extends Controller
         $this->validate($request, [
             'title' => 'required',
             'status' => 'required',
-            'image_url' => 'required|mime:png,jpg,jpeg',
+            'image_url' => 'required|image',
             'content' => 'required'
         ]);
 
-        $post_ = new Post($request->all());
-        $user = Auth::user();
-        $aved = $user->post()->save($post_);
+        $this->message['message'] = 'Something went wrong with image upload';
+
+        $post_ = new Post($request->except('image_url'));
+        if (!empty($request->file('image_url'))) {
+            $imagePath = $request->file('image_url')->store('posts');
+            $user = Auth::user();
+            $post_->image_url = $imagePath;
+            $saved = $user->post()->save($post_);
+
+            $retVal = ($saved) ? 'Successful created' : 'Something went wrong';
+            $this->message['message'] = $retVal;
+            $this->message['status'] = $saved;
+        }
+        
+
+        return ($this->message['status']) ? redirect()->back()->with('success', $this->message['message']) : redirect()->back()->with('error', $this->message['message']);
     }
 
     /**

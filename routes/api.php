@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\UserController;
+use App\Http\Resources\UserCollection;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -22,6 +23,13 @@ use Illuminate\Validation\ValidationException;
 Route::post('/register', [ UserController::class, 'register' ]);
 Route::post('/login', [ UserController::class, 'login' ]);
 
-Route::middleware('auth:api')->get('/user', function (Request $request) {
+Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
+});
+Route::middleware(['auth:sanctum'])->group(function () {
+
+    Route::get('/user', function () {
+        return new UserCollection(User::get());
+    });
+
 });

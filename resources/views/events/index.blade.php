@@ -26,27 +26,31 @@
                                             <th>No</th>
                                             <th>Title</th>
                                             <th>Content</th>
-                                            <th>Photo</th>
+
                                             <th>Status</th>
                                             <th>Date</th>
                                             <th>Action</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr>
-                                            <td>0</td>
-                                            <td>Lunar probe project</td>
-                                            <td>Lunar probe project</td>
-                                            <td>Lunar probe project</td>
-                                            <td>Lunar probe project</td>
-                                            <td>May 15, 2015</td>
-                                            <td>
-                                                <a href="#" class="mr-25" data-toggle="tooltip" data-original-title="Edit">
-                                                    <i class="icon-pencil"></i> </a>
-                                                <a href="#" data-toggle="tooltip" data-original-title="Close"> <i
-                                                        class="icon-trash txt-danger"></i> </a>
-                                            </td>
-                                        </tr>
+                                        @foreach ($events as $item)
+                                            <tr>
+                                                <td>0</td>
+                                                <td>{{ $item->title }}</td>
+                                                <td>{!! $item->content !!}</td>
+                                                <td>{{ $item->status_a }}</td>
+
+                                                <td>{{ $item->date }}</td>
+                                                <td>
+                                                    <a href="#" class="mr-25" data-toggle="tooltip"
+                                                        data-original-title="Edit">
+                                                        <i class="icon-pencil"></i> </a>
+                                                    <a href="#" data-toggle="tooltip" data-original-title="Close"> <i
+                                                            class="icon-trash txt-danger"></i> </a>
+                                                </td>
+                                            </tr>
+                                        @endforeach
+
                                     </tbody>
                                 </table>
                             </div>

@@ -84,22 +84,24 @@ class RolesAndPermissionsSeeder extends Seeder
         //     'delete user'
         // ]
 
-        $roleGeneralAmbassador = Role::create(['name' => 'general-ambassador'])->givePermissionTo([
+        Role::create(['name' => 'general-ambassador'])->givePermissionTo([
             'vote',
             'edit user'
         ]);
 
-        $roleWashAmbassador = Role::create(['name' => 'wash-ambassodor'])->givePermissionTo([
+        Role::create(['name' => 'wash-ambassodor'])->givePermissionTo([
             'vote',
             'edit user'
         ]);
 
-        $roleTeacher = Role::create(['name' => 'teacher']);
-        $roleWard = Role::create(['name' => 'ward' ]);
+        Role::create(['name' => 'normal-user']);
+
+        Role::create(['name' => 'teacher'])->givePermissionTo(['vote']);
+        Role::create(['name' => 'ward' ])->givePermissionTo(['vote', 'add post', 'edit post', 'delete post']);
 
         // or may be done by chaining
-        $role = Role::create(['name' => 'moderator'])
-        ->givePermissionTo(['publish articles', 'unpublish articles']);
+        // $role = Role::create(['name' => 'moderator'])
+        // ->givePermissionTo(['publish articles', 'unpublish articles']);
 
         $role = Role::create(['name' => 'super-admin']);
         $role->givePermissionTo(Permission::all());

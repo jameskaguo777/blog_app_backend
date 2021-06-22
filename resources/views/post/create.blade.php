@@ -18,7 +18,7 @@
                             <p class="mb-25">Fill below to create a post</p>
                             <div class="row">
                                 <div class="col-sm">
-                                    <form action="" method="POST" enctype="multipart/form-data">
+                                    <form action="{{ route('post.store') }}" method="POST" enctype="multipart/form-data">
                                         @csrf
                                         <div class="form-group row">
                                             <label for="inputTitle" class="col-sm-2 col-form-label">Title</label>
@@ -39,9 +39,9 @@
 
                                         <div class="form-group row ml-2">
                                            <label for="inputImageUpload" class="col-form-label">Upload Image</label>
-                                           <input id="inputImageUpload" name="image" type="file" class="form-control ml-4 mr-4">
+                                           <input id="inputImageUpload" name="image_url" type="file" class="form-control ml-4 mr-4">
                                         </div>
-                                        
+
                                         <div class="row">
                                             <div class="col-sm">
                                                 <label class="col-form-label" for="inputContent">

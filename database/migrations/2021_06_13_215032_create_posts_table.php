@@ -18,7 +18,7 @@ class CreatePostsTable extends Migration
             $table->string('title');
             $table->boolean('status');
             $table->string('image_url');
-            $table->string('content');
+            $table->text('content');
             $table->foreignId('user_id')->references('id')->on('users');
             $table->timestamps();
         });
