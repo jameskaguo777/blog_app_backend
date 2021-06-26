@@ -37,7 +37,4 @@ class School extends Model
         return $this->morphMany(Assigned::class, 'assignable');
     }
 
-    public function competitionParticipant(){
-        return $this->morphMany(competitionParticipant::class, 'competition_participantable');
-    }
 }

@@ -11,7 +11,7 @@ class Competition extends Model
 {
     use HasFactory, SpatialTrait;
 
-    protected $fillable = ['theme', 'challenge', 'reward', 'criteria', 'start_date', 'radius', 'end_date', 'geo_locked', 'coordinates', 'start_date', 'end_date'];
+    protected $fillable = ['theme', 'challenge', 'reward', 'criteria', 'start_date', 'radius', 'end_date', 'geo_locked', 'coordinates', 'start_date', 'end_date', 'status'];
 
     protected $cast = [
         'geo_locked' => 'boolean',
@@ -51,5 +51,9 @@ class Competition extends Model
     public function competitionWinner()
     {
         return $this->hasOne(CompetitionWinner::class, 'competition_id', 'id');
+    }
+
+    public function competitionParticipant(){
+        return $this->hasOne(CompetitionParticipant::class, 'user_id', 'id');
     }
 }

@@ -31,7 +31,12 @@ class CompetitionController extends Controller
     public function create()
     {
         //
-        return view('competition.create');
+        $competition = Competition::where('status', true)->first();
+        if (empty($competition)) {
+            return view('competition.create');
+        } else {
+            return redirect()->back()->with('error', 'There is an active challenge in the system');
+        }
     }
 
     /**
@@ -140,5 +145,9 @@ class CompetitionController extends Controller
     public function destroy(Competition $competition)
     {
         //
+    }
+
+    public function listCompetitions(){
+        
     }
 }

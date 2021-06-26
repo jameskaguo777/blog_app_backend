@@ -9,9 +9,25 @@ class CompetitionParticipant extends Model
 {
     use HasFactory;
 
-    protected $fillable = [ 'competition_participantable_id', 'competition_participantable_type' ];
+    protected $fillable = [ 'user_id', 'media_urls', 'competition_id', 'current_location' ];
 
-    public function competitionParticipantable(){
-        return $this->morphTo();
+    protected $cast = [
+        'media_urls'=>'array'
+    ];
+
+    protected $spatialFields = [
+        'current_location'
+    ];
+
+    public function user(){
+        return $this->belongsTo(User::class, 'user_id', 'id');
+    }
+
+    public function competition(){
+        return $this->belongsTo(Competition::class, 'competition_id', 'id');
+    }
+
+    public function vote(){
+        return $this->hasOne(Vote::class, 'competition_participant_id', 'id');
     }
 }

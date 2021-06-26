@@ -2,8 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\CompetitionResource;
+use App\Models\Competition;
 use App\Models\CompetitionParticipant;
+use Grimzy\LaravelMysqlSpatial\Types\Point;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
 
 class CompetitionParticipantController extends Controller
 {
@@ -12,6 +17,8 @@ class CompetitionParticipantController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+    var $message = [];
+
     public function index()
     {
         //
@@ -81,5 +88,29 @@ class CompetitionParticipantController extends Controller
     public function destroy(CompetitionParticipant $competitionParticipant)
     {
         //
+    }
+
+    public function join(Request $request){
+        $validated = Validator::make($request->all(),[
+            'competition_id' => 'required',
+            'media_files' => 'required',
+            'latitude' => 'required',
+            'longitude' => 'required'
+        ]);
+
+        if ($validated->fails()) {
+            $this->message['errors'] = $validated->errors();
+        }
+        $competition = Competition::find($request->competition_id)->get();
+        $user = Auth::user();
+        $mediaUrls = [];
+        $location = new Point($request->latitude, $request->longitude);
+        $competitionParticipant = CompetitionParticipant::create([
+            'user_id'=>$user->id,
+            'competition_id'=>$competition->id,
+            'media_urls' => $mediaUrls,
+            'current_location' => $location
+        ]);
+        return CompetitionResource::collection($competition);
     }
 }

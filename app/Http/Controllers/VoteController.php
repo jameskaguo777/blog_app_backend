@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\CompetitionParticipantResource;
+use App\Models\CompetitionParticipant;
 use App\Models\Vote;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class VoteController extends Controller
 {
@@ -81,5 +84,13 @@ class VoteController extends Controller
     public function destroy(Vote $vote)
     {
         //
+    }
+
+    public function participants(){
+        $competitions_participants = CompetitionParticipant::get()->filter(function($model){
+            return $model->vote->user_id != Auth::id();
+        });
+
+        return CompetitionParticipantResource::collection($competitions_participants);
     }
 }

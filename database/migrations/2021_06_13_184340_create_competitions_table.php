@@ -26,6 +26,7 @@ class CreateCompetitionsTable extends Migration
             $table->point('coordinates')->nullable();
             $table->integer('radius')->nullable();
             $table->string('image_url')->nullable();
+            $table->boolean('status')->nullable();
             $table->timestamps();
         });
     }

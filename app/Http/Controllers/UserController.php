@@ -2,8 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Middleware\TrustProxies;
+use App\Models\Assigned;
 use App\Models\Profile;
+use App\Models\School;
 use App\Models\User;
+use App\Models\Ward;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
@@ -18,6 +22,7 @@ class UserController extends Controller
      * @return \Illuminate\Http\Response
      */
     var $token_result;
+    var $message;
     public function index()
     {
         //
@@ -99,10 +104,9 @@ class UserController extends Controller
         ]);
 
         if ($validated->fails()) {
-            return response()->json([
-                'errors' => $validated->errors(),
-                'message' => 'Something went wrong in validation, Try again'
-            ]);
+            $this->message['errors'] = $validated->errors();
+            $this->message['message'] = 'Something went wrong in validation, Try again';
+            $this->message['success'] = false;
         }
 
         if (filter_var($request->email, FILTER_VALIDATE_EMAIL)) {
@@ -112,23 +116,20 @@ class UserController extends Controller
         }
 
         if (!isset($user)) {
-            return response()->json([
-                'status_code' => 200,
-                'message' => 'Credentials did not match',
-
-            ]);
+            $this->message['success'] = false;
+            $this->message['message'] = 'Credentials did not match';
         }
 
         if (!$user || !Hash::check($request->password, $user->password)) {
-            throw ValidationException::withMessages([
-                'email' => ['The provided credentials are incorrect.'],
-            ]);
+            $this->message['success'] = false;
+            $this->message['message'] = 'Something went wrong we couldn\'t find your records or password is not correct';
+        }else{
+            $this->token_result = $user->createToken($request->device_name)->plainTextToken;
+            $this->message['success'] = true;
         }
 
-        $this->token_result = $user->createToken($request->device_name)->plainTextToken;
-
         return response()->json([
-            'status_code' => 200,
+            'message' => $this->message,
             'access_token' => $this->token_result,
             'token_type' => 'Bearer',
         ]);
@@ -136,12 +137,14 @@ class UserController extends Controller
 
     public function register(Request $request)
     {
-        $validated = Validator::make($request->only(['name', 'email', 'phone', 'password', 'device_name']), [
+        $validated = Validator::make($request->only(['name', 'email', 'phone', 'password', 'device_name', 'activation_code', 'type']), [
             'name' => 'required|max:250',
             'email' => 'email|unique:users',
             'password' => 'required|min:4',
             'phone' => 'required|min:10|unique:users',
             'device_name' => 'required|max:50',
+            'activation_code' => 'nullable',
+            'type' => 'required',
         ], [
             'required' => 'Please input :attribute in the form',
             'max' => 'The :attribute entered exceeded allowed characters',
@@ -150,30 +153,96 @@ class UserController extends Controller
         ]);
 
         if ($validated->fails()) {
-            return response()->json([
-                'errors' => $validated->errors(),
-            ]);
+            $this->message['message'] = 'Something went wrong with data input';
+            $this->message['errors'] = $validated->errors();
+            $this->message['success'] = false;
         }
 
-        DB::transaction(function () use ($request) {
+        if ($request->type === 'user') {
+            DB::transaction(function () use ($request) {
+                $user = User::create([
+                    'name' => $request->name,
+                    'email' => $request->email,
+                    'password' => Hash::make($request->password),
+                    'phone' => $request->phone,
+                ]);
 
+                $profile = new Profile([
+                    'user_id' => $user->id
+                ]);
+                $user->profile()->save($profile);
+                $user->assignRole('normal-user');
+                $this->token_result = $user->createToken($request->device_name)->plainTextToken;
+                $this->message['success'] = true;
+            });
+        } elseif ($request->type === 'school') {
+            $school = School::where('activation_code', $request->activation_code)->first();
+            if (!empty($school)) {
+                DB::transaction(function () use ($request, $school) {
+                    $user = User::create([
+                        'name' => $request->name,
+                        'email' => $request->email,
+                        'password' => Hash::make($request->password),
+                        'phone' => $request->phone,
+                    ]);
 
-            $user = User::create([
-                'name' => $request->name,
-                'email' => $request->email,
-                'password' => Hash::make($request->password),
-                'phone' => $request->phone,
-            ]);
+                    $profile = new Profile([
+                        'user_id' => $user->id
+                    ]);
+                    $saved = $user->profile()->save($profile);
+                    $assigned = new Assigned([
+                        'user_id'=>$user->id
+                    ]);
+                    $associate = $assigned->assignable()->associate($school)->save();
+                    $school->update([
+                        'activation_code_status' => false
+                    ]);
+                    $user->assignRole('teacher');
+                    if ($associate) {
+                        $this->token_result = $user->createToken($request->device_name)->plainTextToken;
+                        $this->message['success'] = true;
+                    }
+                });
+            } else {
+                $this->message['errors'] = ['Activativation code is not found'];
+                $this->message['success'] = false;
+            }
+        } elseif($request->type === 'ward'){
+            $ward = Ward::where('activation_code', $request->activation_code)->first();
+            if (!empty($ward)) {
+                DB::transaction(function () use ($request, $ward) {
+                    $user = User::create([
+                        'name' => $request->name,
+                        'email' => $request->email,
+                        'password' => Hash::make($request->password),
+                        'phone' => $request->phone,
+                    ]);
 
-            Profile::create([
-                'user_id' => $user->id
-            ]);
-
-            $this->token_result = $user->createToken($request->device_name)->plainTextToken;
-        });
+                    $profile = new Profile([
+                        'user_id' => $user->id
+                    ]);
+                    $saved = $user->profile()->save($profile);
+                    $assigned = new Assigned([
+                        'user_id' => $user->id
+                    ]);
+                    $associate = $assigned->assignable()->associate($ward)->save();
+                    $ward->update([
+                        'activation_status' => true
+                    ]);
+                    $user->assignRole('wash-ambassodor');
+                    if ($associate) {
+                        $this->token_result = $user->createToken($request->device_name)->plainTextToken;
+                        $this->message['success'] = true;
+                    }
+                });
+            } else {
+                $this->message['errors'] = ['Activativation code is not found'];
+                $this->message['success'] = false;
+            }
+        }
 
         return response()->json([
-            'status' => 'success',
+            'message' => $this->message,
             'access_token' => $this->token_result,
             'token_type' => 'Bearer',
         ]);

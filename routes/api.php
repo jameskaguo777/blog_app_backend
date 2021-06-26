@@ -1,9 +1,13 @@
 <?php
 
+use App\Http\Controllers\CompetitionParticipantController;
 use App\Http\Controllers\UserController;
-use App\Http\Resources\UserCollection;
+use App\Http\Resources\ProfileResource;
+use App\Http\Resources\UserResource;
+use App\Models\CompetitionParticipant;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Validator;
@@ -28,8 +32,15 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 Route::middleware(['auth:sanctum'])->group(function () {
 
-    Route::get('/user', function () {
-        return new UserCollection(User::get());
+    Route::post('/competition-participant/join', [ CompetitionParticipantController::class, 'join' ]);
+    Route::get('/user', function(){
+        $user = Auth::user();
+
+        return UserResource::collection($user->get());
+    });
+    Route::get('/user/profile', function(){
+        $user = Auth::user();
+        return ProfileResource::collection($user->profile()->get());
     });
 
 });

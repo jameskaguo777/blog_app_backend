@@ -15,8 +15,10 @@ class CreateCompetitionParticipantsTable extends Migration
     {
         Schema::create('competition_participants', function (Blueprint $table) {
             $table->id();
-            $table->integer('competition_participantable_id');
-            $table->string('competition_participantable_type');
+            $table->foreignId('user_id')->nullable()->references('id')->on('users');
+            $table->text('media_urls')->nullable();
+            $table->foreignId('competition_id')->nullable()->references('id')->on('competitions');
+            $table->point('current_location')->nullable();
             $table->timestamps();
         });
     }
