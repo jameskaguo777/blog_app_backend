@@ -4,9 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Models\Comment;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class CommentController extends Controller
 {
+    var $message = [];
     /**
      * Display a listing of the resource.
      *
@@ -15,6 +17,7 @@ class CommentController extends Controller
     public function index()
     {
         //
+       
     }
 
     /**
@@ -36,6 +39,23 @@ class CommentController extends Controller
     public function store(Request $request)
     {
         //
+        $comment = new Comment([
+            'user_id' => Auth::id(),
+            'competition_participant_id' => $request->competition_participant_id,
+            'comment' => $request->comment
+
+        ]);
+        $saved = $comment->save();
+        if ($saved) {
+            $this->message['success'] = true;
+        } else{
+            $this->message['success'] = false;
+            $this->message['message'] = 'Something went wrong try again';
+        }
+        return response()->json([
+            'message' => $this->message,
+        ]);
+
     }
 
     /**

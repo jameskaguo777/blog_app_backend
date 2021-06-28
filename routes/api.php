@@ -1,7 +1,10 @@
 <?php
 
+use App\Http\Controllers\CommentController;
+use App\Http\Controllers\CompetitionController;
 use App\Http\Controllers\CompetitionParticipantController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\VoteController;
 use App\Http\Resources\ProfileResource;
 use App\Http\Resources\UserResource;
 use App\Models\CompetitionParticipant;
@@ -36,11 +39,16 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/user', function(){
         $user = Auth::user();
 
-        return UserResource::collection($user->get());
+        return $user;
     });
     Route::get('/user/profile', function(){
         $user = Auth::user();
         return ProfileResource::collection($user->profile()->get());
     });
+
+    Route::get('/votable', [ VoteController::class, 'votable' ]);
+    Route::post('/vote', [ VoteController::class, 'store' ]);
+    Route::get('/participants', [ CompetitionParticipantController::class, 'participants' ] );
+    Route::get('/competitions', [ CompetitionController::class, 'competitions' ] );
 
 });

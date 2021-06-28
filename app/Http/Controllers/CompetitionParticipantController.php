@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\CompetitionParticipantResource;
 use App\Http\Resources\CompetitionResource;
 use App\Models\Competition;
 use App\Models\CompetitionParticipant;
@@ -112,5 +113,14 @@ class CompetitionParticipantController extends Controller
             'current_location' => $location
         ]);
         return CompetitionResource::collection($competition);
+    }
+
+    public function participants(){
+        $competition = Competition::where('status', true)->first();
+        $participants = CompetitionParticipant::get()->filter(function($model) use($competition){
+            return $model->competition_id == $competition->id;
+        });
+
+        return CompetitionParticipantResource::collection($participants);
     }
 }

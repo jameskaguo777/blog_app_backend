@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\EventResource;
 use App\Models\Event;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -104,5 +105,10 @@ class EventController extends Controller
     public function destroy(Event $event)
     {
         //
+    }
+
+    public function events(){
+        $events = Event::get()->orderBy('desc', 'updated_at');
+        return EventResource::collection($events);
     }
 }

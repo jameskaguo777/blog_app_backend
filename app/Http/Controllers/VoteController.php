@@ -3,13 +3,16 @@
 namespace App\Http\Controllers;
 
 use App\Http\Resources\CompetitionParticipantResource;
+use App\Http\Resources\VoteResource;
 use App\Models\CompetitionParticipant;
 use App\Models\Vote;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class VoteController extends Controller
 {
+    var $message = [];
     /**
      * Display a listing of the resource.
      *
@@ -39,6 +42,21 @@ class VoteController extends Controller
     public function store(Request $request)
     {
         //
+        $vote = new Vote([
+            'user_id' => Auth::id(),
+            'competition_participant_id' => $request->competition_participant_id,
+            'point' => $request->point
+        ]);
+
+        $saved = $vote->save();
+
+        if ($saved) {
+            $this->message['success'] = true;
+        }
+
+        return response()->json([
+            'message' => $this->message
+        ]);
     }
 
     /**
@@ -86,11 +104,18 @@ class VoteController extends Controller
         //
     }
 
-    public function participants(){
-        $competitions_participants = CompetitionParticipant::get()->filter(function($model){
+    public function votable(){
+        $votable = CompetitionParticipant::get()->with('comment')->filter(function($model){
             return $model->vote->user_id != Auth::id();
         });
-
-        return CompetitionParticipantResource::collection($competitions_participants);
+        return VoteResource::collection($votable);
     }
+
+    // public function participants(){
+    //     $competitions_participants = CompetitionParticipant::get()->filter(function($model){
+    //         return $model->vote->user_id != Auth::id();
+    //     });
+
+    //     return CompetitionParticipantResource::collection($competitions_participants);
+    // }
 }

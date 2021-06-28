@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\CompetitionResource;
 use App\Models\Competition;
 use Grimzy\LaravelMysqlSpatial\Types\Point;
 use Illuminate\Http\Request;
@@ -147,7 +148,9 @@ class CompetitionController extends Controller
         //
     }
 
-    public function listCompetitions(){
-        
+    public function competitions(){
+        // $competitions =
+        $competitions = Competition::get()->with('competitionParticipant')->orderBy('desc', 'created_at');
+        return CompetitionResource::collection($competitions);
     }
 }

@@ -9,13 +9,13 @@ class Comment extends Model
 {
     use HasFactory;
 
-    protected $fillable = [ 'user_id', 'competition_id', 'comment' ];
+    protected $fillable = [ 'user_id', 'commentable_id', 'commentable_type', 'comment' ];
 
     public function user(){
         return $this->belongsTo(User::class, 'user_id', 'id');
     }
 
-    public function competition(){
-        return $this->belongsTo(Competition::class, 'competition_id', 'id');
-    }
+   public function commentable(){
+       return $this->morphTo();
+   }
 }

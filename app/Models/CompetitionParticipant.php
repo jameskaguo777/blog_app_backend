@@ -30,4 +30,8 @@ class CompetitionParticipant extends Model
     public function vote(){
         return $this->hasOne(Vote::class, 'competition_participant_id', 'id');
     }
+
+    public function commentable(){
+        return $this->morphMany(Comment::class, 'commentable');
+    }
 }

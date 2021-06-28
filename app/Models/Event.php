@@ -21,4 +21,8 @@ class Event extends Model
     public function user(){
         return $this->belongsTo(User::class, 'user_id', 'id');
     }
+
+    public function commentable(){
+        return $this->morphMany(Comment::class, 'commentable');
+    }
 }
