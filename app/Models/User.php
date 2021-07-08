@@ -44,6 +44,14 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
+    protected $appends = [
+        'user_dp'
+    ];
+
+    public function getUserDpAttribute(){
+        return $this->profile->profile_image;
+    }
+
     public function comment(){
         return $this->hasMany(Comment::class, 'user_id', 'id');
     }

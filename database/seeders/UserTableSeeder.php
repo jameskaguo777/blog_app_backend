@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Profile;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
@@ -18,10 +19,14 @@ class UserTableSeeder extends Seeder
         //
         $user = User::create([
             'name'=> 'Emmanuel Tilemu',
-            'email' => 'jameskaguo@live.com',
-            'phone' => '+255712011189',
-            'password' => Hash::make('secret123')
+            'email' => 'emanuel@tilemu.com',
+            'phone' => '+255712123456',
+            'password' => Hash::make('123456')
 
+        ]);
+
+        $profile = Profile::create([
+            'user_id' => $user->id,
         ]);
 
         $user->assignRole('super-admin');

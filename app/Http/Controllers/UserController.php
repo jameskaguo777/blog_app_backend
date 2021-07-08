@@ -107,6 +107,7 @@ class UserController extends Controller
             $this->message['errors'] = $validated->errors();
             $this->message['message'] = 'Something went wrong in validation, Try again';
             $this->message['success'] = false;
+            goto end;
         }
 
         if (filter_var($request->email, FILTER_VALIDATE_EMAIL)) {
@@ -128,6 +129,7 @@ class UserController extends Controller
             $this->message['success'] = true;
         }
 
+        end:
         return response()->json([
             'message' => $this->message,
             'access_token' => $this->token_result,
@@ -141,21 +143,17 @@ class UserController extends Controller
             'name' => 'required|max:250',
             'email' => 'email|unique:users',
             'password' => 'required|min:4',
-            'phone' => 'required|min:10|unique:users',
+            'phone' => [ 'required', 'string', 'min:10', 'unique:users' ],
             'device_name' => 'required|max:50',
             'activation_code' => 'nullable',
             'type' => 'required',
-        ], [
-            'required' => 'Please input :attribute in the form',
-            'max' => 'The :attribute entered exceeded allowed characters',
-            'min' => ':attribute has low characters',
-            'unique' => ':attribute entered already in use',
         ]);
 
         if ($validated->fails()) {
             $this->message['message'] = 'Something went wrong with data input';
             $this->message['errors'] = $validated->errors();
             $this->message['success'] = false;
+            goto end;
         }
 
         if ($request->type === 'user') {
@@ -229,7 +227,7 @@ class UserController extends Controller
                     $ward->update([
                         'activation_status' => true
                     ]);
-                    $user->assignRole('wash-ambassodor');
+                    $user->assignRole('ward');
                     if ($associate) {
                         $this->token_result = $user->createToken($request->device_name)->plainTextToken;
                         $this->message['success'] = true;
@@ -240,7 +238,7 @@ class UserController extends Controller
                 $this->message['success'] = false;
             }
         }
-
+        end:
         return response()->json([
             'message' => $this->message,
             'access_token' => $this->token_result,

@@ -11,7 +11,7 @@ class Competition extends Model
 {
     use HasFactory, SpatialTrait;
 
-    protected $fillable = ['theme', 'challenge', 'reward', 'criteria', 'start_date', 'radius', 'end_date', 'geo_locked', 'coordinates', 'start_date', 'end_date', 'status'];
+    protected $fillable = ['theme', 'challenge', 'target', 'reward', 'criteria', 'start_date', 'radius', 'end_date', 'geo_locked', 'coordinates', 'start_date', 'end_date', 'status'];
 
     protected $cast = [
         'geo_locked' => 'boolean',
@@ -26,17 +26,22 @@ class Competition extends Model
 
     protected $appends = [
         'geo_locked_a',
-        'remaining_days_percentage'
+        'time_spended'
     ];
 
-    public function getRemainingDaysPercentageAttribute(){
+    public function getTimeSpendedAttribute(){
+        $variables = [];
         $now = Carbon::now();
         $start_date = new Carbon($this->start_date);
         $end_date = new Carbon($this->end_date);
         $total_days = $end_date->diff($start_date)->days;
         $days_expended = $now->diff($start_date)->days;
-
-        return ($days_expended/$total_days)*100;
+        $time_spended_in_percentage = ($days_expended / $total_days) * 100;
+        $variables['time_spended_in_percentage'] = $time_spended_in_percentage;
+        $variables['days_expended'] = $days_expended;
+        $variables['total_days'] = $total_days;
+        $variables['days_remaining'] = $total_days - $days_expended;
+        return $variables;
     }
 
     public function getGeoLockedAAttribute(){
@@ -54,6 +59,6 @@ class Competition extends Model
     }
 
     public function competitionParticipant(){
-        return $this->hasOne(CompetitionParticipant::class, 'user_id', 'id');
+        return $this->hasOne(CompetitionParticipant::class, 'competition_id', 'id');
     }
 }

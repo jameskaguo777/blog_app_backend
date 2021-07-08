@@ -22,7 +22,7 @@ class Event extends Model
         return $this->belongsTo(User::class, 'user_id', 'id');
     }
 
-    public function commentable(){
+    public function comment(){
         return $this->morphMany(Comment::class, 'commentable');
     }
 }

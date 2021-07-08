@@ -3,12 +3,15 @@
 namespace App\Http\Controllers;
 
 use App\Http\Resources\CompetitionParticipantResource;
-use App\Http\Resources\CompetitionResource;
+
 use App\Models\Competition;
 use App\Models\CompetitionParticipant;
 use Grimzy\LaravelMysqlSpatial\Types\Point;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+
 use Illuminate\Support\Facades\Auth;
+
 use Illuminate\Support\Facades\Validator;
 
 class CompetitionParticipantController extends Controller
@@ -91,7 +94,7 @@ class CompetitionParticipantController extends Controller
         //
     }
 
-    public function join(Request $request){
+    public function join(Request $request):JsonResponse{
         $validated = Validator::make($request->all(),[
             'competition_id' => 'required',
             'media_files' => 'required',
@@ -100,27 +103,55 @@ class CompetitionParticipantController extends Controller
         ]);
 
         if ($validated->fails()) {
+            $this->message['success'] = false;
             $this->message['errors'] = $validated->errors();
+            $this->message['message'] = 'Some data missing';
+            goto end;
         }
-        $competition = Competition::find($request->competition_id)->get();
+        $competition = Competition::find($request->competition_id);
         $user = Auth::user();
-        $mediaUrls = [];
+
         $location = new Point($request->latitude, $request->longitude);
-        $competitionParticipant = CompetitionParticipant::create([
+        $competitionParticipant = new CompetitionParticipant([
             'user_id'=>$user->id,
             'competition_id'=>$competition->id,
-            'media_urls' => $mediaUrls,
             'current_location' => $location
         ]);
-        return CompetitionResource::collection($competition);
+
+        $media_array = [];
+
+        if ($request->hasFile('media_files')) {
+            if (is_array($request->media_files)) {
+                foreach ($request->media_files as $media) {
+                    $media_path = $request->file($media)->store('participants');
+                    array_push($media_array, $media_path);
+                }
+            } else{
+                $media_path = $request->file('media_files')->store('participants');
+                array_push($media_array, $media_path);
+            }
+        }
+
+        $competitionParticipant->media_urls = $media_array;
+
+        $saved = $competitionParticipant->save();
+        if ($saved) {
+            $this->message['success'] = true;
+        }else{
+            $this->message['message'] = 'Something went wrong please try again later';
+        }
+
+        end:
+        return response()->json([
+            'message' => $this->message,
+        ]);
     }
 
     public function participants(){
         $competition = Competition::where('status', true)->first();
-        $participants = CompetitionParticipant::get()->filter(function($model) use($competition){
+        $participants = CompetitionParticipant::with(['comment', 'competition'])->get()->filter(function($model) use($competition){
             return $model->competition_id == $competition->id;
         });
-
         return CompetitionParticipantResource::collection($participants);
     }
 }

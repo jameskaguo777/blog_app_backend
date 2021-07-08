@@ -16,7 +16,7 @@ class CreateVotesTable extends Migration
         Schema::create('votes', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->references('id')->on('users');
-            $table->foreignId('competition_id')->references('id')->on('competitions');
+            $table->foreignId('competition_participant_id')->references('id')->on('competition_participants');
             $table->integer('point')->nullable();
             $table->timestamps();
         });

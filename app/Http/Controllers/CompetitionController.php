@@ -77,6 +77,7 @@ class CompetitionController extends Controller
                 'start_date' => $request->start_date,
                 'end_date' => $request->end_date,
                 'image_url' => $imagePath,
+                'status' => true
             ]);
             if ($request->geo_locked) {
                 $coodinates = new Point($request->latitude, $request->longitude);
@@ -86,21 +87,20 @@ class CompetitionController extends Controller
             }
 
             $saved = $competition->save();
-            
             $retVal = ($saved) ? 'Successful created' : 'Something went wrong';
             $message['message'] = $retVal;
             $message['status'] = $saved;
         } else{
             $competition = new Competition($request->except('image_url', 'radius'));
             $competition->image_url = $imagePath;
-            // dd($competition);
+            $competition->status = true;
             $saved = $competition->save();
             $retVal = ($saved) ? 'Successful created' : 'Something went wrong';
             $message['message'] = $retVal;
             $message['status'] = $saved;
         }
 
-       return ($message['status']) ? redirect()->back()->with('success', $message['message']) : redirect()->back()->with('error', $message['message']);
+       return ($message['status']) ? redirect()->route('competitions')->with('success', $message['message']) : redirect()->back()->with('error', $message['message']);
     }
 
     /**
@@ -150,7 +150,7 @@ class CompetitionController extends Controller
 
     public function competitions(){
         // $competitions =
-        $competitions = Competition::get()->with('competitionParticipant')->orderBy('desc', 'created_at');
+        $competitions = Competition::orderBy('created_at', 'desc')->get();
         return CompetitionResource::collection($competitions);
     }
 }

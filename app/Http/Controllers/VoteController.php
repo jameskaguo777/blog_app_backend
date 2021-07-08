@@ -105,8 +105,11 @@ class VoteController extends Controller
     }
 
     public function votable(){
-        $votable = CompetitionParticipant::get()->with('comment')->filter(function($model){
-            return $model->vote->user_id != Auth::id();
+        $votable = CompetitionParticipant::get()->filter(function($model){
+            if (!empty($model->vote)) {
+                return $model->vote->user_id != Auth::id();
+            }
+            return $model;
         });
         return VoteResource::collection($votable);
     }

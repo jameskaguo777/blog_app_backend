@@ -45,7 +45,13 @@
                                         @foreach ($competitions as $item)
                                             <tr>
                                                 <td>0</td>
-                                                <td>{{ $item->theme }}</td>
+                                                <td>{{ $item->theme }} <br> @if ($item->status)
+                                                    <span class="feather-icon"><i data-feather="check-circle"
+                                                        style="color: green;"></i></span>
+                                                @else
+                                                    <span class="feather-icon"><i data-feather="check-circle"
+                                                        style="color: red;"></i></span>
+                                                @endif</td>
                                                 <td>{{ $item->challenge }}</td>
                                                 <td>{{ $item->criteria }}</td>
                                                 <td>{{ $item->reward }}</td>
@@ -56,7 +62,7 @@
                                                     <br>
                                                     {{-- {{ $item->remaining_days_percentage }} --}}
                                                     <div class="progress progress-bar-xs mb-0 ">
-                                                        <div class="progress-bar progress-bar-danger" style="width: {{ $item->remaining_days_percentage }}%">
+                                                        <div class="progress-bar progress-bar-danger" style="width: {{ $item->time_spended['time_spended_in_percentage'] }}%">
                                                         </div>
                                                     </div>
                                                 </td>

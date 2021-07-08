@@ -2,14 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Comment;
+use App\Http\Resources\CompetitionParticipantResource;
 use App\Models\CompetitionParticipant;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
-class CommentController extends Controller
+class CompetitionResultsController extends Controller
 {
-    var $message = [];
     /**
      * Display a listing of the resource.
      *
@@ -18,7 +17,6 @@ class CommentController extends Controller
     public function index()
     {
         //
-       
     }
 
     /**
@@ -40,43 +38,28 @@ class CommentController extends Controller
     public function store(Request $request)
     {
         //
-        $competition_participant = CompetitionParticipant::find($request->competition_participant_id);
-        $user_id = Auth::id();
-        $comment = new Comment([
-            'user_id' => $user_id,
-            'comment' => $request->comment
-        ]);
-        $saved = $comment->commentable()->associate($competition_participant)->save();
-        if ($saved) {
-            $this->message['success'] = true;
-        } else{
-            $this->message['success'] = false;
-            $this->message['message'] = 'Something went wrong try again';
-        }
-        return response()->json([
-            'message' => $this->message,
-        ]);
-
     }
 
     /**
      * Display the specified resource.
      *
-     * @param  \App\Models\Comment  $comment
+     * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show(Comment $comment)
+    public function show($id)
     {
-        //
+            $participant = CompetitionParticipant::where('competition_id', $id)->with(['vote', 'user.assigned.assignable'])
+            ->get();
+        return CompetitionParticipantResource::collection($participant);
     }
 
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  \App\Models\Comment  $comment
+     * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit(Comment $comment)
+    public function edit($id)
     {
         //
     }
@@ -85,10 +68,10 @@ class CommentController extends Controller
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Comment  $comment
+     * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Comment $comment)
+    public function update(Request $request, $id)
     {
         //
     }
@@ -96,10 +79,10 @@ class CommentController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Models\Comment  $comment
+     * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Comment $comment)
+    public function destroy($id)
     {
         //
     }

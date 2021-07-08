@@ -11,6 +11,15 @@ class Comment extends Model
 
     protected $fillable = [ 'user_id', 'commentable_id', 'commentable_type', 'comment' ];
 
+    protected $appends = [
+        'commenter'
+    ];
+
+    public function getCommenterAttribute()
+    {
+        return User::find($this->user_id)->name;
+    }
+
     public function user(){
         return $this->belongsTo(User::class, 'user_id', 'id');
     }

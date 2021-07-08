@@ -108,7 +108,8 @@ class EventController extends Controller
     }
 
     public function events(){
-        $events = Event::get()->orderBy('desc', 'updated_at');
+        $events = Event::orderBy('updated_at', 'desc')->get();
         return EventResource::collection($events);
     }
+
 }

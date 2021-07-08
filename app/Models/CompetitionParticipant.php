@@ -4,14 +4,15 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Grimzy\LaravelMysqlSpatial\Eloquent\SpatialTrait;
 
 class CompetitionParticipant extends Model
 {
-    use HasFactory;
+    use HasFactory, SpatialTrait;
 
     protected $fillable = [ 'user_id', 'media_urls', 'competition_id', 'current_location' ];
 
-    protected $cast = [
+    protected $casts = [
         'media_urls'=>'array'
     ];
 
@@ -28,10 +29,10 @@ class CompetitionParticipant extends Model
     }
 
     public function vote(){
-        return $this->hasOne(Vote::class, 'competition_participant_id', 'id');
+        return $this->hasMany(Vote::class, 'competition_participant_id', 'id');
     }
 
-    public function commentable(){
+    public function comment(){
         return $this->morphMany(Comment::class, 'commentable');
     }
 }
