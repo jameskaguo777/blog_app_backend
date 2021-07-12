@@ -11,6 +11,27 @@ class Comment extends Model
 
     protected $fillable = [ 'user_id', 'commentable_id', 'commentable_type', 'comment' ];
 
+    public static function boot()
+    {
+        parent::boot();
+
+        static::created(function ($item) {
+            // $user
+            $ambassodor = Ambassodor::where('user_id', $item->user_id);
+            if (!$ambassodor->empty()) {
+                $point = $ambassodor->point;
+                $ambassodor->update([
+                    'point' => (int)$point + 1
+                ]);
+            } else {
+                Ambassodor::create([
+                    'user_id' => $item->user_id,
+                    'point' => 1
+                ]);
+            }
+        });
+    }
+
     protected $appends = [
         'commenter'
     ];

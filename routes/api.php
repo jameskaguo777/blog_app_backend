@@ -5,6 +5,7 @@ use App\Http\Controllers\CompetitionController;
 use App\Http\Controllers\CompetitionParticipantController;
 use App\Http\Controllers\CompetitionResultsController;
 use App\Http\Controllers\EventController;
+use App\Http\Controllers\PostController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\VoteController;
 use App\Http\Resources\AssignedResource;
@@ -13,6 +14,7 @@ use App\Http\Resources\ProfileResource;
 use App\Http\Resources\UserResource;
 use App\Models\Competition;
 use App\Models\CompetitionParticipant;
+use App\Models\HealthEmergency;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Routing\RouteGroup;
@@ -62,8 +64,13 @@ Route::middleware(['auth:sanctum'])->group(function () {
         return new ProfileResource($user->profile);
     });
 
+    Route::get('/events', [ EventController::class, 'events' ]);
+    Route::get('/posts', [ PostController::class, 'posts' ]);
+    Route::post('health-emergency', [ HealthEmergency::class, 'store' ]);
+
     // teacher || ward
     Route::middleware(['role:teacher|ward'])->group(function () {
+
         Route::post('/competition-participant/join', [CompetitionParticipantController::class, 'join']);
     });
 
@@ -79,8 +86,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
         Route::get('/competitions', [ CompetitionController::class, 'competitions' ]);
         Route::get('/competition/{id}', [ CompetitionResultsController::class, 'show' ]);
-
-        Route::get('/events', [ EventController::class, 'events' ]);
     });
 
 });

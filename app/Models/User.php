@@ -84,4 +84,8 @@ class User extends Authenticatable
         return $this->hasMany(CompetitionParticipant::class, 'user_id', 'id');
     }
 
+    public function ambassodor(){
+        return $this->hasMany(Ambassodor::class, 'user_id', 'id');
+    }
+
 }

@@ -7,7 +7,27 @@ use Illuminate\Database\Eloquent\Model;
 
 class Post extends Model
 {
-    use HasFactory;
+
+    public static function boot(){
+        parent::boot();
+
+        static::created(function($item){
+            // $user
+            $ambassodor = Ambassodor::where('user_id', $item->user_id);
+            if (!$ambassodor->empty()) {
+                $point = $ambassodor->point;
+                $ambassodor->update([
+                    'point' => (int)$point + 1
+                ]);
+            }else {
+                Ambassodor::create([
+                    'user_id' => $item->user_id,
+                    'point' => 1
+                ]);
+            }
+        });
+    }
+
     protected $fillable = [ 'title', 'status', 'image_url', 'content', 'user_id' ];
 
     protected $appends = [

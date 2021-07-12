@@ -15,6 +15,7 @@ class CreateHealthEmergenciesTable extends Migration
     {
         Schema::create('health_emergencies', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('user_id')->references('id')->on('users');
             $table->text('note')->nullable();
             $table->text('media_url')->nullable();
             $table->point('coordinates')->nullable();

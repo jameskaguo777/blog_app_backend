@@ -84,15 +84,15 @@ class RolesAndPermissionsSeeder extends Seeder
         //     'delete user'
         // ]
 
-        Role::create(['name' => 'general-ambassador'])->givePermissionTo([
-            'vote',
-            'edit user'
-        ]);
+        // Role::create(['name' => 'general-ambassador'])->givePermissionTo([
+        //     'vote',
+        //     'edit user'
+        // ]);
 
-        Role::create(['name' => 'wash-ambassodor'])->givePermissionTo([
-            'vote',
-            'edit user'
-        ]);
+        // Role::create(['name' => 'challenge-ambassodor'])->givePermissionTo([
+        //     'vote',
+        //     'edit user'
+        // ]);
 
         Role::create(['name' => 'normal-user']);
 

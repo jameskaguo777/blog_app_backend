@@ -15,7 +15,7 @@ class CreatePointsTable extends Migration
     {
         Schema::create('points', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->references('id')->on('points');
+            $table->foreignId('user_id')->references('id')->on('users');
             $table->integer('points');
             $table->timestamps();
         });
